@@ -21,20 +21,28 @@ public class MemberController {
 
     @GetMapping("/login")
     public String showLogin() {
+        if (rq.isLogin()) {
+            throw new RuntimeException("이미 로그인 되었습니다.");
+        }
+
         return "usr/member/login";
     }
 
     @PostMapping("/login")
     public String login(String username, String password) {
+        if (rq.isLogin()) {
+            throw new RuntimeException("이미 로그인 되었습니다.");
+        }
+
         Optional<Member> opMember = memberService.findByUsername(username);
 
-        if ( opMember.isEmpty() ) {
+        if (opMember.isEmpty()) {
             return "redirect:/usr/member/login?error";
         }
 
         Member member = opMember.get();
 
-        if ( member.getPassword().equals(password) == false ) {
+        if (member.getPassword().equals(password) == false) {
             return "redirect:/usr/member/login?error";
         }
 
@@ -45,6 +53,10 @@ public class MemberController {
 
     @PostMapping("/logout")
     public String logout() {
+        if (rq.isLogout()) {
+            return "redirect:/";
+        }
+
         rq.removeCookie("loginedMemberId");
 
         return "redirect:/";
@@ -52,6 +64,10 @@ public class MemberController {
 
     @GetMapping("/me")
     public String showMe() {
+        if (rq.isLogout()) {
+            return "redirect:/usr/member/login";
+        }
+
         return "usr/member/me";
     }
 }

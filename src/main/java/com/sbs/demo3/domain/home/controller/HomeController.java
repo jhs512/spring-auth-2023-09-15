@@ -16,6 +16,15 @@ public class HomeController {
         return "usr/home/main";
     }
 
+    @GetMapping("/admin")
+    public String showAdmin() {
+        if (!rq.isAdmin()) {
+            throw new RuntimeException("관리자 여야 합니다.");
+        }
+
+        return "usr/home/admin";
+    }
+
     @GetMapping("/cookies")
     @ResponseBody
     public String showCookies() {

@@ -101,10 +101,6 @@ public class Rq {
         return !isLogin();
     }
 
-    public boolean isAdmin() {
-        return member.isAdmin();
-    }
-
     public Member getMember() {
         if ( isLogout() ) {
             return null;
@@ -119,5 +115,11 @@ public class Rq {
         }
 
         return member;
+    }
+
+    public boolean isAdmin() {
+        if ( isLogout() ) return false;
+
+        return getMember().isAdmin();
     }
 }
