@@ -15,6 +15,15 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+                .formLogin(
+                        formLogin -> formLogin
+                                .loginPage("/usr/member/login")
+                )
+                .logout(
+                        logout -> logout
+                                .logoutUrl("/usr/member/logout")
+                );
 
         return http.build();
     }
