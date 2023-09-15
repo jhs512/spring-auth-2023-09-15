@@ -3,9 +3,9 @@ package com.sbs.demo3.domain.member.controller;
 import com.sbs.demo3.base.rq.Rq;
 import com.sbs.demo3.domain.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
@@ -17,31 +17,14 @@ public class MemberController {
     private final MemberService memberService;
 
     @GetMapping("/login")
+    @PreAuthorize("isAnonymous()")
     public String showLogin() {
-        if (rq.isLogin()) {
-            throw new RuntimeException("이미 로그인 되었습니다.");
-        }
-
         return "usr/member/login";
     }
 
-    @PostMapping("/logout")
-    public String logout() {
-        if (rq.isLogout()) {
-            return "redirect:/";
-        }
-
-        rq.removeSession("loginedMemberId");
-
-        return "redirect:/";
-    }
-
     @GetMapping("/me")
+    @PreAuthorize("isAuthenticated()")
     public String showMe() {
-        if (rq.isLogout()) {
-            return "redirect:/usr/member/login";
-        }
-
         return "usr/member/me";
     }
 }
