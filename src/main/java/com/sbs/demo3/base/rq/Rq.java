@@ -47,4 +47,18 @@ public class Rq {
 
         return sb.toString();
     }
+
+    public void setCookie(String name, String value) {
+        Cookie cookie = new Cookie(name, value);
+        cookie.setPath("/");
+        resp.addCookie(cookie);
+    }
+
+    public void removeCookie(String name) {
+        Cookie cookie = new Cookie(name, "");
+        cookie.setMaxAge(0);
+        cookie.setPath("/");
+        resp.addCookie(cookie);
+    }
+
 }
