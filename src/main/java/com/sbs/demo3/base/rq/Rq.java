@@ -1,5 +1,6 @@
 package com.sbs.demo3.base.rq;
 
+import com.sbs.demo3.domain.member.entity.Member;
 import com.sbs.demo3.domain.member.service.MemberService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,6 +16,7 @@ public class Rq {
     private final HttpServletRequest req;
     private final HttpServletResponse resp;
     private final HttpSession session;
+    private Member member = null;
 
     public Rq(MemberService memberService, HttpServletRequest req, HttpServletResponse resp, HttpSession session) {
         this.memberService = memberService;
@@ -61,4 +63,61 @@ public class Rq {
         resp.addCookie(cookie);
     }
 
+    private String getCookie(String name, String defaultValue) {
+        Cookie[] cookies = req.getCookies();
+
+        if (cookies == null) {
+            return defaultValue;
+        }
+
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals(name)) {
+                return cookie.getValue();
+            }
+        }
+
+        return defaultValue;
+    }
+
+    private int getCookieAsInt(String name, int defaultValue) {
+        String cookie = getCookie(name, null);
+
+        if (cookie == null) {
+            return defaultValue;
+        }
+
+        return Integer.parseInt(cookie);
+    }
+
+    private int getLoginedMemberId() {
+        return getCookieAsInt("loginedMemberId", 0);
+    }
+
+    public boolean isLogin() {
+        return getLoginedMemberId() != 0;
+    }
+
+    public boolean isLogout() {
+        return !isLogin();
+    }
+
+    public boolean isAdmin() {
+        return member.isAdmin();
+    }
+
+    public Member getMember() {
+        if ( isLogout() ) {
+            return null;
+        }
+
+        if (member == null) {
+            int loginedMemberId = getLoginedMemberId();
+
+            if (loginedMemberId != 0) {
+                member = memberService.findById(loginedMemberId).get();
+            }
+        }
+
+        return member;
+    }
 }
