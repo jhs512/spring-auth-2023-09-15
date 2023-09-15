@@ -6,6 +6,9 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
@@ -17,12 +20,22 @@ public class Rq {
     private final HttpServletResponse resp;
     private final HttpSession session;
     private Member member = null;
+    private final User user;
 
     public Rq(MemberService memberService, HttpServletRequest req, HttpServletResponse resp, HttpSession session) {
         this.memberService = memberService;
         this.req = req;
         this.resp = resp;
         this.session = session;
+
+        // 현재 로그인한 회원의 인증정보를 가져옴
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication.getPrincipal() instanceof User) {
+            this.user = (User) authentication.getPrincipal();
+        } else {
+            this.user = null;
+        }
     }
 
     public String getAllCookieValuesAsString() {
@@ -50,12 +63,14 @@ public class Rq {
         return sb.toString();
     }
 
-    private long getLoginedMemberId() {
-        return getSessionAsLong("loginedMemberId", 0);
+    private String getLoginedMemberUsername() {
+        if (isLogout()) return null;
+
+        return user.getUsername();
     }
 
     public boolean isLogin() {
-        return getLoginedMemberId() != 0;
+        return user != null;
     }
 
     public boolean isLogout() {
@@ -68,11 +83,7 @@ public class Rq {
         }
 
         if (member == null) {
-            long loginedMemberId = getLoginedMemberId();
-
-            if (loginedMemberId != 0) {
-                member = memberService.findById(loginedMemberId).get();
-            }
+            member = memberService.findByUsername(getLoginedMemberUsername()).get();
         }
 
         return member;
