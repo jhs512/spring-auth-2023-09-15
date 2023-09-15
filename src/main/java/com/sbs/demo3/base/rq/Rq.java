@@ -50,15 +50,70 @@ public class Rq {
         return sb.toString();
     }
 
-    public void setCookie(String name, String value) {
-        Cookie cookie = new Cookie(name, value);
-        cookie.setPath("/");
-        resp.addCookie(cookie);
+    private long getLoginedMemberId() {
+        return getSessionAsLong("loginedMemberId", 0);
     }
 
-    public void removeCookie(String name) {
-        Cookie cookie = new Cookie(name, "");
-        cookie.setMaxAge(0);
+    public boolean isLogin() {
+        return getLoginedMemberId() != 0;
+    }
+
+    public boolean isLogout() {
+        return !isLogin();
+    }
+
+    public Member getMember() {
+        if (isLogout()) {
+            return null;
+        }
+
+        if (member == null) {
+            long loginedMemberId = getLoginedMemberId();
+
+            if (loginedMemberId != 0) {
+                member = memberService.findById(loginedMemberId).get();
+            }
+        }
+
+        return member;
+    }
+
+    public boolean isAdmin() {
+        if (isLogout()) return false;
+
+        return getMember().isAdmin();
+    }
+
+    // 세션 관련 함수
+    public void setSession(String name, Object value) {
+        session.setAttribute(name, value);
+    }
+
+    private Object getSession(String name, Object defaultValue) {
+        Object value = session.getAttribute(name);
+
+        if (value == null) {
+            return defaultValue;
+        }
+
+        return value;
+    }
+
+    private long getSessionAsLong(String name, long defaultValue) {
+        Object value = getSession(name, null);
+
+        if (value == null) return defaultValue;
+
+        return (long) value;
+    }
+
+    public void removeSession(String name) {
+        session.removeAttribute(name);
+    }
+
+    // 쿠키 관련
+    public void setCookie(String name, String value) {
+        Cookie cookie = new Cookie(name, value);
         cookie.setPath("/");
         resp.addCookie(cookie);
     }
@@ -79,47 +134,20 @@ public class Rq {
         return defaultValue;
     }
 
-    private int getCookieAsInt(String name, int defaultValue) {
-        String cookie = getCookie(name, null);
+    private long getCookieAsLong(String name, int defaultValue) {
+        String value = getCookie(name, null);
 
-        if (cookie == null) {
+        if (value == null) {
             return defaultValue;
         }
 
-        return Integer.parseInt(cookie);
+        return Long.parseLong(value);
     }
 
-    private int getLoginedMemberId() {
-        return getCookieAsInt("loginedMemberId", 0);
-    }
-
-    public boolean isLogin() {
-        return getLoginedMemberId() != 0;
-    }
-
-    public boolean isLogout() {
-        return !isLogin();
-    }
-
-    public Member getMember() {
-        if ( isLogout() ) {
-            return null;
-        }
-
-        if (member == null) {
-            int loginedMemberId = getLoginedMemberId();
-
-            if (loginedMemberId != 0) {
-                member = memberService.findById(loginedMemberId).get();
-            }
-        }
-
-        return member;
-    }
-
-    public boolean isAdmin() {
-        if ( isLogout() ) return false;
-
-        return getMember().isAdmin();
+    public void removeCookie(String name) {
+        Cookie cookie = new Cookie(name, "");
+        cookie.setMaxAge(0);
+        cookie.setPath("/");
+        resp.addCookie(cookie);
     }
 }

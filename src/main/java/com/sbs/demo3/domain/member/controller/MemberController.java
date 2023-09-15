@@ -46,7 +46,7 @@ public class MemberController {
             return "redirect:/usr/member/login?error";
         }
 
-        rq.setCookie("loginedMemberId", member.getId() + "");
+        rq.setSession("loginedMemberId", member.getId());
 
         return "redirect:/";
     }
@@ -57,7 +57,7 @@ public class MemberController {
             return "redirect:/";
         }
 
-        rq.removeCookie("loginedMemberId");
+        rq.removeSession("loginedMemberId");
 
         return "redirect:/";
     }
