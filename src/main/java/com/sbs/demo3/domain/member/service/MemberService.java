@@ -5,15 +5,18 @@ import com.sbs.demo3.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @Transactional
     public Member join(String username, String password, String nickname) {
         Member member = Member
                 .builder()
@@ -31,5 +34,16 @@ public class MemberService {
 
     public Optional<Member> findById(long id) {
         return memberRepository.findById(id);
+    }
+
+    @Transactional
+    public void modify(Member member, String password, String nickname) {
+        if (password != null && password.length() > 0) {
+            member.setPassword(passwordEncoder.encode(password));
+        }
+
+        if (nickname != null && nickname.length() > 0) {
+            member.setNickname(nickname);
+        }
     }
 }
