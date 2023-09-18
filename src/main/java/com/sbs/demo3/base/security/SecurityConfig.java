@@ -21,6 +21,7 @@ public class SecurityConfig {
                 .formLogin(
                         formLogin -> formLogin
                                 .loginPage("/usr/member/login")
+                                .successHandler(new CustomSimpleUrlAuthenticationSuccessHandler())
                                 .failureHandler(new CustomSimpleUrlAuthenticationFailureHandler())
                 )
                 .logout(
