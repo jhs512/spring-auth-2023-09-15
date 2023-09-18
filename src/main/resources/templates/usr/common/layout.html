@@ -6,7 +6,16 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-    <title layout:title-pattern="$CONTENT_TITLE | $LAYOUT_TITLE" th:utext="데모2"></title>
+    <title layout:title-pattern="$CONTENT_TITLE | $LAYOUT_TITLE" th:utext="데모3"></title>
+
+    <!-- 제이쿼리 불러오기 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <!-- toastr 불러오기 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>
+    <link rel="stylesheet" href="https://jhs512.github.io/toastr/toastr.css">
+
+    <script src="/resource/common/common.js"></script>
 </head>
 
 <body>
@@ -33,6 +42,34 @@
     <main layout:fragment="main"></main>
 </div>
 
+<script>
+    // URL에서 msg 파라미터의 값을 가져오는 함수
+    function getMsgFromURL() {
+        const url = new URL(window.location.href);
+        return url.searchParams.get('msg');
+    }
 
+    function getErrorMsgFromURL() {
+        const url = new URL(window.location.href);
+        return url.searchParams.get('errorMsg');
+    }
+
+    // 페이지가 로드되었을 때 실행될 함수
+    window.onload = function() {
+        const message = getMsgFromURL();
+
+        // msg 파라미터의 값이 있으면 toastr로 알림을 표시
+        if (message) {
+            toastNotice(decodeURIComponent(message));
+        }
+
+        const errorMessage = getErrorMsgFromURL();
+
+        // msg 파라미터의 값이 있으면 toastr로 알림을 표시
+        if (errorMessage) {
+            toastWarning(decodeURIComponent(errorMessage));
+        }
+    }
+</script>
 </body>
 </html>
