@@ -3,6 +3,7 @@ package com.sbs.demo3.domain.member.controller;
 import com.sbs.demo3.base.rq.Rq;
 import com.sbs.demo3.domain.member.entity.Member;
 import com.sbs.demo3.domain.member.service.MemberService;
+import com.sbs.demo3.standard.util.Ut;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -42,6 +43,6 @@ public class MemberController {
         Member member = rq.getMember();
         memberService.modify(member, password, nickname);
 
-        return "redirect:/usr/member/me";
+        return "redirect:/usr/member/me?msg=" + Ut.url.encode("회원정보가 수정되었습니다.");
     }
 }
